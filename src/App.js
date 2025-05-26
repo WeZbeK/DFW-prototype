@@ -1,26 +1,42 @@
-import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "./firebase";
 
+// LOGIN KOMPONENT
 function Login() {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = () => {
-    if (username === "manager" && password === "rusk123") {
+  const handleLogin = async () => {
+    console.log("Prøver login med:", email, password);
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
       navigate("/dashboard");
-    } else {
-      setError("Forkert brugernavn eller adgangskode");
+    } catch (err) {
+      console.error("Login fejl:", err.code, err.message);
+      setError("Login mislykkedes: " + err.message);
     }
   };
 
   return (
     <div style={{ padding: "20px", fontFamily: "Arial" }}>
       <h2>Log ind</h2>
-      <input placeholder="Brugernavn" value={username} onChange={e => setUsername(e.target.value)} />
+      <input
+        type="email"
+        placeholder="E-mail"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
       <br />
-      <input type="password" placeholder="Adgangskode" value={password} onChange={e => setPassword(e.target.value)} />
+      <input
+        type="password"
+        placeholder="Adgangskode"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
       <br />
       <button onClick={handleLogin}>Log ind</button>
       {error && <p style={{ color: "red" }}>{error}</p>}
@@ -28,6 +44,7 @@ function Login() {
   );
 }
 
+// DASHBOARD KOMPONENT
 function Dashboard() {
   return (
     <div style={{ padding: "20px", fontFamily: "Arial" }}>
@@ -41,6 +58,7 @@ function Dashboard() {
   );
 }
 
+// APP MED ROUTING
 function App() {
   return (
     <Router>
